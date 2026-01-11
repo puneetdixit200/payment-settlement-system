@@ -118,14 +118,29 @@ A comprehensive enterprise-grade payment settlement and reconciliation platform 
 ### Prerequisites
 - Node.js 18+
 - MongoDB (local or Atlas)
-- Razorpay/Stripe API keys (optional)
+- Docker & Docker Compose (optional)
 
-### Installation
+### Option 1: Docker Deployment (Recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/mrpunpoon/payment-settlement-system.git
+cd payment-settlement-system
+
+# Start all services with Docker
+docker-compose up -d
+
+# Access the application
+# Frontend: http://localhost
+# Backend API: http://localhost:5000
+```
+
+### Option 2: Manual Installation
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/payreconcile.git
-cd payreconcile
+git clone https://github.com/mrpunpoon/payment-settlement-system.git
+cd payment-settlement-system
 ```
 
 2. **Install Backend Dependencies**
@@ -146,9 +161,6 @@ PORT=5000
 MONGODB_URI=mongodb://localhost:27017/payreconcile
 JWT_SECRET=your-secret-key
 JWT_EXPIRES_IN=7d
-RAZORPAY_KEY_ID=your-razorpay-key
-RAZORPAY_KEY_SECRET=your-razorpay-secret
-STRIPE_SECRET_KEY=your-stripe-key
 ```
 
 4. **Install Frontend Dependencies**
