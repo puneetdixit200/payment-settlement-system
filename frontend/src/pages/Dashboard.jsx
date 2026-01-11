@@ -25,23 +25,24 @@ import { dashboardAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
-// Quick Stats Card with gradient background
+// Quick Stats Card with gradient background - Enhanced Professional Style
 const QuickStatCard = ({ title, value, subtext, icon: Icon, gradient, trend, trendType }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    whileHover={{ scale: 1.02, y: -2 }}
-    transition={{ duration: 0.2 }}
-    className={`relative overflow-hidden rounded-2xl p-6 text-white shadow-lg ${gradient}`}
+    whileHover={{ scale: 1.02, y: -4, boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}
+    transition={{ duration: 0.3, ease: 'easeOut' }}
+    className={`relative overflow-hidden rounded-2xl p-6 text-white shadow-xl ${gradient}`}
+    style={{ boxShadow: '0 10px 40px -10px rgba(0,0,0,0.2)' }}
   >
     <div className="relative z-10">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-white/80">{title}</p>
-          <p className="text-3xl font-bold mt-1">{value}</p>
-          {subtext && <p className="text-sm text-white/70 mt-1">{subtext}</p>}
+          <p className="text-sm font-medium text-white/90 uppercase tracking-wide">{title}</p>
+          <p className="text-4xl font-extrabold mt-2 tracking-tight">{value}</p>
+          {subtext && <p className="text-sm text-white/80 mt-2 font-medium">{subtext}</p>}
           {trend !== undefined && (
-            <div className={`flex items-center gap-1 mt-2 text-sm ${
+            <div className={`flex items-center gap-1.5 mt-3 text-sm font-semibold ${
               trendType === 'positive' ? 'text-green-200' : 'text-red-200'
             }`}>
               {trendType === 'positive' ? (
@@ -53,33 +54,34 @@ const QuickStatCard = ({ title, value, subtext, icon: Icon, gradient, trend, tre
             </div>
           )}
         </div>
-        <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-          <Icon className="w-7 h-7" />
+        <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-md shadow-inner">
+          <Icon className="w-8 h-8" />
         </div>
       </div>
     </div>
-    {/* Decorative elements */}
+    {/* Enhanced Decorative elements */}
+    <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
+    <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl" />
     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
   </motion.div>
 );
 
-// Quick Action Card
+// Quick Action Card - Enhanced Professional Style
 const QuickActionCard = ({ title, description, icon: Icon, onClick, color }) => (
   <motion.button
-    whileHover={{ scale: 1.02, y: -2 }}
+    whileHover={{ scale: 1.02, y: -3, boxShadow: '0 15px 30px -10px rgba(0,0,0,0.1)' }}
     whileTap={{ scale: 0.98 }}
     onClick={onClick}
-    className={`flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all w-full text-left group`}
+    className="flex items-center gap-4 p-5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all w-full text-left group"
   >
-    <div className={`p-3 rounded-xl ${color}`}>
-      <Icon className="w-5 h-5 text-white" />
+    <div className={`p-3.5 rounded-xl ${color} shadow-lg`}>
+      <Icon className="w-6 h-6 text-white" />
     </div>
     <div className="flex-1">
-      <p className="font-semibold text-slate-900 group-hover:text-primary-600 transition-colors">{title}</p>
-      <p className="text-sm text-slate-500">{description}</p>
+      <p className="font-bold text-slate-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{title}</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>
     </div>
-    <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
+    <ArrowRight className="w-5 h-5 text-slate-300 dark:text-slate-600 group-hover:text-primary-600 dark:group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
   </motion.button>
 );
 
@@ -317,14 +319,14 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Quick Stats Cards with Comparison */}
+      {/* Quick Stats Cards - Light Pastel Colors */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <QuickStatCard
           title="Total Volume"
           value={formatCurrency(totalAmount)}
           subtext={`${transactions.total?.toLocaleString() || 0} transactions`}
           icon={DollarSign}
-          gradient="bg-gradient-to-br from-blue-500 to-blue-600"
+          gradient="bg-gradient-to-br from-blue-400 to-blue-500"
           trend={comparisonData?.volumeChange}
           trendType={parseFloat(comparisonData?.volumeChange || 0) >= 0 ? 'positive' : 'negative'}
         />
@@ -333,7 +335,7 @@ const Dashboard = () => {
           value={`${successRate}%`}
           subtext={`${transactions.successCount?.toLocaleString() || 0} successful`}
           icon={TrendingUp}
-          gradient="bg-gradient-to-br from-emerald-500 to-emerald-600"
+          gradient="bg-gradient-to-br from-emerald-400 to-teal-500"
           trend={comparisonData?.successRateChange}
           trendType={parseFloat(comparisonData?.successRateChange || 0) >= 0 ? 'positive' : 'negative'}
         />
@@ -342,14 +344,14 @@ const Dashboard = () => {
           value={transactions.failedCount?.toLocaleString() || '0'}
           subtext="Needs attention"
           icon={XCircle}
-          gradient="bg-gradient-to-br from-red-500 to-red-600"
+          gradient="bg-gradient-to-br from-rose-400 to-pink-500"
         />
         <QuickStatCard
           title="SLA Breaches"
           value={transactions.slaBreachedCount?.toLocaleString() || '0'}
           subtext={`Avg: ${slaData?.summary?.avgSettlementHours?.toFixed(1) || 0}h`}
           icon={AlertTriangle}
-          gradient="bg-gradient-to-br from-amber-500 to-amber-600"
+          gradient="bg-gradient-to-br from-amber-400 to-orange-500"
         />
       </div>
 
@@ -358,9 +360,9 @@ const Dashboard = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="flex flex-wrap items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100"
+        className="flex flex-wrap items-center gap-4 p-5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700"
       >
-        <span className="text-sm font-medium text-slate-600">Transaction Status:</span>
+        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Transaction Status:</span>
         <StatusBadge status="success" count={`${transactions.successCount || 0} Success`} />
         <StatusBadge status="pending" count={`${transactions.pendingCount || 0} Pending`} />
         <StatusBadge status="failed" count={`${transactions.failedCount || 0} Failed`} />
@@ -369,6 +371,65 @@ const Dashboard = () => {
         </div>
       </motion.div>
 
+      {/* Additional Stats Row - More Grids */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-xl p-4 border border-slate-200 dark:border-slate-600"
+        >
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Pending Recon</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{transactions.pendingCount || 0}</p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gradient-to-br from-emerald-50 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-4 border border-emerald-200 dark:border-emerald-700"
+        >
+          <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Matched Today</p>
+          <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">{transactions.matchedCount || 0}</p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-4 border border-blue-200 dark:border-blue-700"
+        >
+          <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">Avg Settlement</p>
+          <p className="text-2xl font-bold text-blue-700 dark:text-blue-300 mt-1">{slaData?.summary?.avgSettlementHours?.toFixed(1) || 0}h</p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-900/30 dark:to-violet-900/30 rounded-xl p-4 border border-purple-200 dark:border-purple-700"
+        >
+          <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide">Active Merchants</p>
+          <p className="text-2xl font-bold text-purple-700 dark:text-purple-300 mt-1">{data?.topMerchants?.length || 0}</p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30 rounded-xl p-4 border border-amber-200 dark:border-amber-700"
+        >
+          <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">Disputes Open</p>
+          <p className="text-2xl font-bold text-amber-700 dark:text-amber-300 mt-1">{transactions.unmatchedCount || 0}</p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-gradient-to-br from-cyan-50 to-teal-100 dark:from-cyan-900/30 dark:to-teal-900/30 rounded-xl p-4 border border-cyan-200 dark:border-cyan-700"
+        >
+          <p className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wide">Gateways Active</p>
+          <p className="text-2xl font-bold text-cyan-700 dark:text-cyan-300 mt-1">{gatewayStats.length || 0}</p>
+        </motion.div>
+      </div>
+
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Transaction Trend - Takes 2 columns */}
@@ -376,14 +437,14 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6"
+          className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6"
         >
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">Transaction Trend</h3>
-              <p className="text-sm text-slate-500">Last 7 days performance</p>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Transaction Trend</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Last 7 days performance</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 p-2 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
               <Activity className="w-5 h-5 text-primary-500" />
             </div>
           </div>
@@ -439,11 +500,11 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6"
+          className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6"
         >
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-slate-900">Reconciliation</h3>
-            <p className="text-sm text-slate-500">Current status breakdown</p>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Reconciliation</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Current status breakdown</p>
           </div>
           <div className="h-48 flex items-center justify-center">
             {reconciliationData.length > 0 ? (
@@ -486,7 +547,7 @@ const Dashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <QuickActionCard
             title="Upload Files"
@@ -519,31 +580,31 @@ const Dashboard = () => {
         </div>
       </motion.div>
 
-      {/* Bottom Section - Top Merchants & Gateway Performance */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Bottom Section - Top Merchants */}
+      <div className="grid grid-cols-1 gap-6">
         {/* Top Merchants */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6"
+          className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">Top Merchants</h3>
-              <p className="text-sm text-slate-500">By transaction volume</p>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Top Merchants</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">By transaction volume</p>
             </div>
             <button 
               onClick={() => navigate('/merchants')}
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+              className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 font-semibold"
             >
               View all →
             </button>
           </div>
-          <div className="space-y-3">
-            {data?.topMerchants?.slice(0, 5).map((merchant, index) => (
-              <div key={merchant._id} className="flex items-center gap-4 p-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold ${
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {data?.topMerchants?.slice(0, 6).map((merchant, index) => (
+              <div key={merchant._id} className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-lg ${
                   index === 0 ? 'bg-gradient-to-br from-amber-400 to-amber-500' :
                   index === 1 ? 'bg-gradient-to-br from-slate-400 to-slate-500' :
                   index === 2 ? 'bg-gradient-to-br from-amber-600 to-amber-700' :
@@ -552,72 +613,21 @@ const Dashboard = () => {
                   {index + 1}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-900 truncate">
+                  <p className="font-semibold text-slate-900 dark:text-white truncate">
                     {merchant.merchant_info?.name || merchant._id}
                   </p>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     {merchant.transactionCount} transactions
                   </p>
                 </div>
-                <p className="font-semibold text-slate-900">
+                <p className="font-bold text-slate-900 dark:text-white">
                   {formatCurrency(merchant.totalAmount)}
                 </p>
               </div>
             ))}
             {(!data?.topMerchants || data.topMerchants.length === 0) && (
-              <div className="text-center py-8 text-slate-400">
+              <div className="col-span-full text-center py-8 text-slate-400">
                 <p>No merchant data available yet</p>
-              </div>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Gateway Performance */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">Gateway Performance</h3>
-              <p className="text-sm text-slate-500">Success rates by gateway</p>
-            </div>
-            <button 
-              onClick={() => navigate('/payment-gateways')}
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-            >
-              Manage →
-            </button>
-          </div>
-          <div className="space-y-4">
-            {gatewayStats.length > 0 ? gatewayStats.map((gateway, index) => {
-              const rate = ((gateway.successRate || 0) * 100).toFixed(1);
-              const colors = ['bg-blue-500', 'bg-purple-500', 'bg-emerald-500'];
-              return (
-                <div key={gateway._id || index} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-slate-700">{gateway._id}</span>
-                    <span className="text-sm font-semibold text-slate-900">{rate}%</span>
-                  </div>
-                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: `${rate}%` }}
-                      transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                      className={`h-full rounded-full ${colors[index % colors.length]}`}
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs text-slate-500">
-                    <span>{gateway.count?.toLocaleString()} transactions</span>
-                    <span>{formatCurrency(gateway.amount)}</span>
-                  </div>
-                </div>
-              );
-            }) : (
-              <div className="text-center py-8 text-slate-400">
-                <p>No gateway data available yet</p>
               </div>
             )}
           </div>

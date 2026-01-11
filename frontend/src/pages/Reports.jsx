@@ -44,10 +44,10 @@ const Reports = () => {
       if (dateRange.start) params.start_date = dateRange.start;
       if (dateRange.end) params.end_date = dateRange.end;
       
-      // Determine report type for filename
+      // Determine report type for filename fallback
       const reportName = selectedReport || 'transactions';
-      const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `${reportName}_report_${timestamp}.${format}`;
+      const timestamp = Date.now();
+      const fallbackFilename = `${reportName}_${timestamp}.${format}`;
       
       if (selectedReport === 'merchant') {
         response = await exportAPI.merchants(params);
@@ -56,27 +56,43 @@ const Reports = () => {
       }
       
       if (format !== 'json') {
+        // Try to get filename from Content-Disposition header
+        let filename = fallbackFilename;
+        const contentDisposition = response.headers?.['content-disposition'];
+        if (contentDisposition) {
+          const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+          if (match && match[1]) {
+            filename = match[1].replace(/['"]/g, '');
+          }
+        }
+        
         const mimeType = format === 'csv' ? 'text/csv' : 'application/pdf';
         const blob = new Blob([response.data], { type: mimeType });
+        
+        console.log(`Exporting ${format}: ${blob.size} bytes as ${filename}`);
+        
+        // Use modern download approach
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        
+        // Append to body, click, then remove
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+        
+        // Cleanup blob URL
         window.URL.revokeObjectURL(url);
+        
+        toast.success(`Downloaded: ${filename}`, { id: 'export' });
+      } else {
+        toast.success('Export complete', { id: 'export' });
       }
       
-      toast.success(`Exported: ${filename}`, { id: 'export' });
-      
-      // Reset form after successful export
-      setSelectedReport(null);
-      setReportData(null);
-      setDateRange({ start: '', end: '' });
-      
     } catch (error) {
-      toast.error('Export failed', { id: 'export' });
+      console.error('Export error:', error);
+      toast.error('Export failed: ' + (error.message || 'Unknown error'), { id: 'export' });
     }
   };
 
@@ -132,7 +148,7 @@ const Reports = () => {
       {reportData && !loading && (
         <div className="card">
           <div className="card-header flex items-center justify-between">
-            <h3 className="font-semibold">Report Results</h3>
+            <h3 className="font-semibold dark:text-white">Report Results</h3>
             <div className="flex gap-2">
               <button onClick={() => handleExport('csv')} className="btn btn-outline btn-sm flex items-center gap-1">
                 <Download className="w-3 h-3" /> CSV
@@ -143,25 +159,101 @@ const Reports = () => {
             </div>
           </div>
           <div className="card-body">
-            {reportData.summary && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                {Object.entries(reportData.summary)
-                  .filter(([key, value]) => typeof value !== 'object' || value === null)
-                  .map(([key, value]) => (
-                  <div key={key} className="p-4 bg-slate-50 rounded-lg">
-                    <p className="text-sm text-slate-500 capitalize">{key.replace(/_/g, ' ')}</p>
-                    <p className="text-xl font-bold text-slate-900">
-                      {typeof value === 'number' ? value.toLocaleString() : String(value ?? 0)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-            {(reportData.transactions || reportData.breaches || []).length > 0 && (
-              <div className="overflow-x-auto">
-                <p className="text-sm text-slate-500">Showing first 10 records</p>
-              </div>
-            )}
+            {/* Handle different report data structures */}
+            {(() => {
+              // Daily report returns data directly as summary
+              const summaryData = reportData.summary || (selectedReport === 'daily' ? reportData : null);
+              const listData = reportData.transactions || reportData.breaches || (Array.isArray(reportData) ? reportData : null);
+              
+              return (
+                <>
+                  {/* Summary Stats */}
+                  {summaryData && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                      {Object.entries(summaryData)
+                        .filter(([key, value]) => typeof value !== 'object' || value === null)
+                        .map(([key, value]) => (
+                        <div key={key} className="p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                          <p className="text-sm text-slate-500 dark:text-slate-400 capitalize">{key.replace(/_/g, ' ')}</p>
+                          <p className="text-xl font-bold text-slate-900 dark:text-white">
+                            {typeof value === 'number' ? value.toLocaleString() : String(value ?? 0)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Merchant Settlements Table (array data) */}
+                  {Array.isArray(reportData) && reportData.length > 0 && (
+                    <div className="overflow-x-auto">
+                      <table className="table w-full">
+                        <thead>
+                          <tr>
+                            <th>Merchant</th>
+                            <th>Transactions</th>
+                            <th>Amount</th>
+                            <th>Success Rate</th>
+                            <th>Match Rate</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reportData.slice(0, 10).map((row, idx) => (
+                            <tr key={idx}>
+                              <td className="dark:text-white">{row.merchant_name || row.merchant_id}</td>
+                              <td className="dark:text-slate-300">{row.total_transactions}</td>
+                              <td className="dark:text-slate-300">₹{row.total_amount?.toLocaleString()}</td>
+                              <td className="dark:text-slate-300">{row.success_rate}%</td>
+                              <td className="dark:text-slate-300">{row.match_rate}%</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Showing {Math.min(10, reportData.length)} of {reportData.length} records</p>
+                    </div>
+                  )}
+                  
+                  {/* Transactions/Breaches List */}
+                  {listData && listData.length > 0 && !Array.isArray(reportData) && (
+                    <div className="overflow-x-auto">
+                      <table className="table w-full">
+                        <thead>
+                          <tr>
+                            <th>Transaction ID</th>
+                            <th>Merchant</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {listData.slice(0, 10).map((row, idx) => (
+                            <tr key={idx}>
+                              <td className="font-mono text-sm dark:text-slate-300">{row.transaction_id}</td>
+                              <td className="dark:text-white">{row.merchant_id}</td>
+                              <td className="dark:text-slate-300">₹{row.amount?.toLocaleString()}</td>
+                              <td>
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  row.status === 'SUCCESS' ? 'bg-green-100 text-green-700' :
+                                  row.status === 'FAILED' ? 'bg-red-100 text-red-700' :
+                                  'bg-yellow-100 text-yellow-700'
+                                }`}>{row.status || row.reconciliation_status}</span>
+                              </td>
+                              <td className="dark:text-slate-300">{row.transaction_date ? new Date(row.transaction_date).toLocaleDateString() : '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Showing {Math.min(10, listData.length)} of {listData.length} records</p>
+                    </div>
+                  )}
+                  
+                  {/* No Data Message */}
+                  {!summaryData && !listData && !Array.isArray(reportData) && (
+                    <p className="text-center text-slate-500 dark:text-slate-400 py-4">No data available for this report</p>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
       )}

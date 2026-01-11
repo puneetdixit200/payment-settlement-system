@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const reconciliationRunSchema = new mongoose.Schema({
   run_id: {
     type: String,
-    unique: true,
-    required: true
+    unique: true
+    // Note: run_id is auto-generated in pre-save hook, not required on creation
   },
   status: {
     type: String,

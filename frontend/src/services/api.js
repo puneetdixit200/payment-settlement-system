@@ -154,9 +154,18 @@ export const reportAPI = {
 };
 
 export const exportAPI = {
-  settlements: (params) => api.get('/export/settlements', { params, responseType: params.format === 'json' ? 'json' : 'blob' }),
-  transactions: (params) => api.get('/export/transactions', { params, responseType: params.format === 'json' ? 'json' : 'blob' }),
-  merchants: (params) => api.get('/export/merchants', { params, responseType: params.format === 'json' ? 'json' : 'blob' })
+  settlements: (params) => {
+    const responseType = params.format === 'json' ? 'json' : (params.format === 'pdf' ? 'arraybuffer' : 'blob');
+    return api.get('/export/settlements', { params, responseType });
+  },
+  transactions: (params) => {
+    const responseType = params.format === 'json' ? 'json' : (params.format === 'pdf' ? 'arraybuffer' : 'blob');
+    return api.get('/export/transactions', { params, responseType });
+  },
+  merchants: (params) => {
+    const responseType = params.format === 'json' ? 'json' : (params.format === 'pdf' ? 'arraybuffer' : 'blob');
+    return api.get('/export/merchants', { params, responseType });
+  }
 };
 
 export const gatewayAPI = {

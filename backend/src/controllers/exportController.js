@@ -77,10 +77,13 @@ const exportSettlements = asyncHandler(async (req, res) => {
   }
 
   if (format === 'pdf') {
+    const filename = `settlements_${Date.now()}.pdf`;
+    const filepath = path.join(EXPORT_DIR, filename);
+    ensureExportDir();
+    
     const doc = new PDFDocument({ margin: 50 });
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=settlements_${Date.now()}.pdf`);
-    doc.pipe(res);
+    const writeStream = fs.createWriteStream(filepath);
+    doc.pipe(writeStream);
 
     // Title
     doc.fontSize(20).text('Settlement Report', { align: 'center' });
@@ -105,19 +108,20 @@ const exportSettlements = asyncHandler(async (req, res) => {
     doc.fontSize(8);
 
     // Simple table
-    const tableTop = doc.y;
     settlements.slice(0, 50).forEach((s, i) => {
-      const y = tableTop + (i * 20);
-      if (y > 700) return; // Page limit
-
-      doc.text(s.transaction_id, 50, y, { width: 100 });
-      doc.text(s.merchant?.name || s.merchant_id, 150, y, { width: 120 });
-      doc.text(`${s.currency} ${s.amount}`, 270, y, { width: 80 });
-      doc.text(s.status, 350, y, { width: 60 });
-      doc.text(s.sla_breached ? 'BREACH' : 'OK', 410, y, { width: 60 });
+      doc.text(`${s.transaction_id} | ${s.merchant?.name || s.merchant_id} | ${s.currency} ${s.amount} | ${s.status}`);
     });
 
     doc.end();
+    
+    // Wait for file to be written, then send
+    writeStream.on('finish', () => {
+      res.download(filepath, filename, (err) => {
+        // Optionally delete file after download
+        // fs.unlinkSync(filepath);
+        if (err) console.error('Download error:', err);
+      });
+    });
     return;
   }
 
@@ -199,10 +203,13 @@ const exportTransactions = asyncHandler(async (req, res) => {
   }
 
   if (format === 'pdf') {
+    const filename = `transactions_${Date.now()}.pdf`;
+    const filepath = path.join(EXPORT_DIR, filename);
+    ensureExportDir();
+    
     const doc = new PDFDocument({ margin: 50, size: 'A4', layout: 'landscape' });
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=transactions_${Date.now()}.pdf`);
-    doc.pipe(res);
+    const writeStream = fs.createWriteStream(filepath);
+    doc.pipe(writeStream);
 
     doc.fontSize(18).text('Transaction Report', { align: 'center' });
     doc.moveDown();
@@ -210,21 +217,23 @@ const exportTransactions = asyncHandler(async (req, res) => {
     doc.text(`Total Records: ${transactions.length}`, { align: 'center' });
     doc.moveDown(2);
 
+    // Table header
+    doc.fontSize(9).text('Txn ID | Merchant | Amount | Status | Source | Recon Status', { underline: true });
+    doc.moveDown();
+    
     doc.fontSize(8);
-    const tableTop = doc.y;
-    transactions.slice(0, 40).forEach((t, i) => {
-      const y = tableTop + (i * 15);
-      if (y > 500) return;
-
-      doc.text(t.transaction_id, 30, y, { width: 120 });
-      doc.text(t.merchant_id, 150, y, { width: 80 });
-      doc.text(t.amount.toString(), 230, y, { width: 60 });
-      doc.text(t.status, 290, y, { width: 60 });
-      doc.text(t.source, 350, y, { width: 60 });
-      doc.text(t.reconciliation_status, 410, y, { width: 100 });
+    transactions.slice(0, 50).forEach((t, i) => {
+      doc.text(`${t.transaction_id} | ${t.merchant_id} | ${t.amount} | ${t.status} | ${t.source} | ${t.reconciliation_status}`);
     });
 
     doc.end();
+    
+    // Wait for file to be written, then send
+    writeStream.on('finish', () => {
+      res.download(filepath, filename, (err) => {
+        if (err) console.error('Download error:', err);
+      });
+    });
     return;
   }
 
@@ -318,10 +327,13 @@ const exportMerchants = asyncHandler(async (req, res) => {
   }
 
   if (format === 'pdf') {
+    const filename = `merchants_${Date.now()}.pdf`;
+    const filepath = path.join(EXPORT_DIR, filename);
+    ensureExportDir();
+    
     const doc = new PDFDocument({ margin: 50 });
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=merchants_${Date.now()}.pdf`);
-    doc.pipe(res);
+    const writeStream = fs.createWriteStream(filepath);
+    doc.pipe(writeStream);
 
     doc.fontSize(18).text('Merchant Summary Report', { align: 'center' });
     doc.moveDown();
@@ -341,6 +353,13 @@ const exportMerchants = asyncHandler(async (req, res) => {
     });
 
     doc.end();
+    
+    // Wait for file to be written, then send
+    writeStream.on('finish', () => {
+      res.download(filepath, filename, (err) => {
+        if (err) console.error('Download error:', err);
+      });
+    });
     return;
   }
 

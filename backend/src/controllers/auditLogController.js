@@ -232,18 +232,34 @@ const exportAuditLogs = asyncHandler(async (req, res) => {
 
     const csv = [headers.join(','), ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))].join('\n');
 
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename=audit_logs_${Date.now()}.csv`);
-    return res.send(csv);
+    // Save to logs folder
+    const filename = `audit_logs_${Date.now()}.csv`;
+    const filepath = path.join(LOG_DIR, filename);
+    fs.writeFileSync(filepath, csv, 'utf-8');
+
+    // Send file to browser
+    res.download(filepath, filename);
+    return;
   }
 
-  // Default JSON format
+  // Default JSON format - also save to logs folder
+  const jsonData = JSON.stringify({
+    logs,
+    total: logs.length,
+    exported_at: new Date()
+  }, null, 2);
+  
+  const filename = `audit_logs_${Date.now()}.json`;
+  const filepath = path.join(LOG_DIR, filename);
+  fs.writeFileSync(filepath, jsonData, 'utf-8');
+
   res.status(200).json({
     success: true,
     data: {
       logs,
       total: logs.length,
-      exported_at: new Date()
+      exported_at: new Date(),
+      saved_to: filename
     }
   });
 });
