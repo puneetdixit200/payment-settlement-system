@@ -4,7 +4,7 @@
   <img src="screenshots/dashboard.png" alt="PayReconcile Dashboard" width="100%">
 </p>
 
-A comprehensive enterprise-grade payment settlement and reconciliation platform built with **Node.js**, **React**, and **MongoDB**. Integrates with **Razorpay** and **Stripe** payment gateways for real-time transaction sync and automated reconciliation.
+A comprehensive enterprise-grade payment settlement and reconciliation platform built with **Node.js**, **React**, and **MongoDB**. Automates transaction matching between bank statements and merchant records.
 
 ## ✨ Features
 
@@ -14,43 +14,45 @@ A comprehensive enterprise-grade payment settlement and reconciliation platform 
 - Secure password hashing with bcrypt
 - Session management with auto-logout
 
-### 📊 Dashboard & Analytics
-- Real-time transaction statistics
+### 📊 Professional Dashboard
+- Real-time transaction statistics with 10 stat cards
+- Lighter pastel color gradients for modern look
 - Date range picker with presets (Today, 7d, 30d, 90d)
-- Period-over-period comparison indicators
 - Transaction trends visualization
-- Reconciliation status breakdown
+- Reconciliation status donut chart
+- Top merchants ranking
 
 ### 💳 Transaction Management
 - Full CRUD operations for transactions
 - Advanced search and filtering
-- Quick filter presets (Today, This Week, Failed Only, etc.)
-- Bulk status updates
-- PDF report generation
+- Bulk actions (approve, reject, edit)
+- PDF report generation & export
+- Real-time status updates
 
 ### 🏢 Merchant Management
 - Merchant onboarding and management
-- Merchant performance analytics
+- Per-merchant analytics
 - Volume and success rate tracking
-- Merchant rankings by performance
 
 ### ⚖️ Automated Reconciliation
-- Rule-based transaction matching
-- Support for multiple matching strategies
-- SLA breach detection and tracking
-- Reconciliation run history
+- **Combined Upload + Reconciliation page** for streamlined workflow
+- Hash-map based O(n) matching algorithm
+- Matches by: `transaction_id + merchant_id + amount`
+- Date window validation (24h default)
+- Amount tolerance configuration
+- Dispute detection for mismatches
 
-### 🔌 Payment Gateway Integrations
-- **Razorpay** - Full API integration with webhook support
-- **Stripe** - Payment sync and management
-- Real-time transaction syncing
-- Gateway performance comparison
+### 📁 File Upload
+- CSV/Excel file parsing
+- Bank statement import
+- Merchant records import
+- Column auto-mapping
 
 ### 🌙 User Experience
-- Dark mode support with system preference detection
+- Full dark mode support
 - Responsive design for all screen sizes
-- Smooth animations with Framer Motion
-- Toast notifications for actions
+- Smooth Framer Motion animations
+- Toast notifications for all actions
 
 ---
 
